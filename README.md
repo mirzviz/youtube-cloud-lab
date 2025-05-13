@@ -1,0 +1,3 @@
+# Cloud-First YouTube Clone
+
+This project is a modern YouTube clone built with a cloud-first architecture. It leverages AWS services for video processing, storage, and delivery, with a React-based frontend for a responsive user experience. The backend is designed with serverless functions for video upload handling and processing, while infrastructure is managed through Terraform for consistent and reproducible deployments. 
