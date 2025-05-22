@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🧠 Cursor Task Management Rule
+
+## Description
+Automate task tracking by updating `TASKS.md` based on development progress.
+
+## Rule
+When a task listed in `TASKS.md` is completed:
+- Mark the corresponding checkbox as `[x]`
+- Move the task to the "✅ Completed" section
+- Ensure the task list remains organized and up-to-date
+
+## Activation
+This rule applies to all files within the project and is triggered upon task completion events.
