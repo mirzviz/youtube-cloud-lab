@@ -10,8 +10,14 @@ Amplify.configure({
         oauth: {
           domain: 'eu-north-1ttlkhyaxw.auth.eu-north-1.amazoncognito.com',
           scopes: ['email', 'openid', 'profile'],
-          redirectSignIn: ['http://localhost:5173'],
-          redirectSignOut: ['http://localhost:5173'],
+          redirectSignIn: [
+            'http://localhost:5173',
+            'https://d3198bag3jewyq.cloudfront.net'
+          ],
+          redirectSignOut: [
+            'http://localhost:5173',
+            'https://d3198bag3jewyq.cloudfront.net'
+          ],
           responseType: 'code'
         }
       }
