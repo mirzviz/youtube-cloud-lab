@@ -11,7 +11,7 @@
 - [x] Display success message upon successful upload
 
 ## 🚧 In Progress
-
+- [ ] Install and Configure AWS Amplify in React App
 
 ## 📝 Future Enhancements
 - [ ] Implement video preview feature
