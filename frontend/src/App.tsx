@@ -9,6 +9,7 @@ function App() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [file, setFile] = useState<File | null>(null)
   const [filename, setFilename] = useState('')
+  const [videoId, setVideoId] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
   const [error, setError] = useState('')
@@ -37,12 +38,17 @@ function App() {
     setError('')
     
     try {
+      const newVideoId = crypto.randomUUID()
+      setVideoId(newVideoId)
+      const newFilename = `${newVideoId}.mp4`
+      setFilename(newFilename)
+
       const response = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/upload-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ filename }),
+        body: JSON.stringify({ filename: newFilename }),
       })
 
       if (!response.ok) {
