@@ -6,7 +6,7 @@ import { LogoutButton } from './components/LogoutButton'
 import { useAuth } from './hooks/useAuth'
 
 function App() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user, getAuthToken } = useAuth();
   const [file, setFile] = useState<File | null>(null)
   const [filename, setFilename] = useState('')
   const [_, setVideoId] = useState<string>('')
@@ -44,10 +44,16 @@ function App() {
       console.log(newFilename);
       setFilename(newFilename)
 
+      const idToken = await getAuthToken();
+      if (!idToken) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/upload-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
         },
         body: JSON.stringify({ filename: newFilename }),
       })

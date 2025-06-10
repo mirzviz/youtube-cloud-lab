@@ -37,5 +37,15 @@ export function useAuth() {
     }
   }
 
-  return { isAuthenticated, user, isLoading };
+  async function getAuthToken() {
+    try {
+      const session = await fetchAuthSession();
+      return session.tokens?.idToken?.toString();
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      return null;
+    }
+  }
+
+  return { isAuthenticated, user, isLoading, getAuthToken };
 } 
