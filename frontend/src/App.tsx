@@ -9,7 +9,9 @@ function App() {
   const { isAuthenticated, isLoading, user, getAuthToken } = useAuth();
   const [file, setFile] = useState<File | null>(null)
   const [filename, setFilename] = useState('')
-  const [_, setVideoId] = useState<string>('')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [videoId, setVideoId] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
   const [error, setError] = useState('')
@@ -29,8 +31,8 @@ function App() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!file || !filename) {
-      setError('Please select a file and provide a filename')
+    if (!file || !filename || !title) {
+      setError('Please select a file, provide a filename, and title')
       return
     }
 
@@ -75,6 +77,31 @@ function App() {
       if (!uploadResponse.ok) {
         throw new Error('Failed to upload file')
       }
+
+      // Register video metadata
+      const metadataResponse = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/register-video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          videoId: newVideoId,
+          title,
+          description: description || '',
+          createdAt: new Date().toISOString()
+        }),
+      })
+
+      if (!metadataResponse.ok) {
+        throw new Error('Failed to register video metadata')
+      }
+
+      console.log('Video uploaded successfully:', {
+        videoId: newVideoId,
+        title,
+        description: description || '(no description)'
+      });
 
       setUploadComplete(true)
     } catch (err) {
@@ -130,6 +157,39 @@ function App() {
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
                   hover:file:bg-blue-100"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                  focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+                  p-2 border"
+                placeholder="Enter video title"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                  focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+                  p-2 border"
+                placeholder="Enter video description"
+                rows={3}
               />
             </div>
 
