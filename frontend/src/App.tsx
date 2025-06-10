@@ -4,9 +4,11 @@ import './App.css'
 import { LoginButton } from './components/LoginButton'
 import { LogoutButton } from './components/LogoutButton'
 import { useAuth } from './hooks/useAuth'
+import { useDarkMode } from './hooks/useDarkMode'
 
 function App() {
   const { isAuthenticated, isLoading, user, getAuthToken } = useAuth();
+  const { isDark, toggleDarkMode } = useDarkMode();
   const [file, setFile] = useState<File | null>(null)
   const [filename, setFilename] = useState('')
   const [title, setTitle] = useState('')
@@ -113,23 +115,30 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-600 dark:text-gray-200">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="fixed top-4 right-4 z-50">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
+      <div className="fixed top-4 right-4 z-50 flex gap-2 items-center">
+        <button
+          onClick={toggleDarkMode}
+          className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 shadow"
+          aria-label="Toggle dark mode"
+        >
+          {isDark ? '🌙 Dark' : '☀️ Light'}
+        </button>
         {isAuthenticated ? <LogoutButton /> : <LoginButton />}
       </div>
       <div className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Video Upload</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Video Upload</h1>
             {isAuthenticated && user && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 Welcome, {user.name}
               </p>
             )}
