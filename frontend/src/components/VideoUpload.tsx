@@ -59,6 +59,7 @@ const VideoUpload: React.FC = () => {
       }
 
       const { uploadUrl } = await response.json();
+      console.log('[Upload] Uploading file:', { filename: newFilename, file: selectedFile });
 
       // Upload file
       const uploadResponse = await fetch(uploadUrl, {
@@ -74,18 +75,20 @@ const VideoUpload: React.FC = () => {
       }
 
       // Register video metadata
+      const metadata = {
+        videoId: newVideoId,
+        title,
+        description: description || '',
+        createdAt: new Date().toISOString()
+      };
+      console.log('[Upload] Registering video metadata:', metadata);
       const metadataResponse = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/register-video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${idToken}`
         },
-        body: JSON.stringify({
-          videoId: newVideoId,
-          title,
-          description: description || '',
-          createdAt: new Date().toISOString()
-        }),
+        body: JSON.stringify(metadata),
       });
 
       if (!metadataResponse.ok) {

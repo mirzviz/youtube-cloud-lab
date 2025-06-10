@@ -9,19 +9,27 @@ interface Video {
 }
 
 async function fetchVideos(): Promise<Video[]> {
-  const res = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/listVideos');
-  if (!res.ok) throw new Error('Failed to fetch videos');
-  const data = await res.json();
-  return data.videos || [];
+  console.log('[fetchVideos] called');
+  try {
+    const res = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/listVideos');
+    console.log('[fetchVideos] response status:', res.status);
+    if (!res.ok) throw new Error('Failed to fetch videos');
+    const data = await res.json();
+    console.log('[fetchVideos] API response:', data);
+    return data.videos || [];
+  } catch (err) {
+    console.error('[fetchVideos] Error fetching videos:', err);
+    throw err;
+  }
 }
 
 const VideoList: React.FC = () => {
-  const { data: videos, isLoading, isError, error } = useQuery<Video[], Error>({
+  const { data: videos, isLoading, isError, error, isFetching, status } = useQuery<Video[], Error>({
     queryKey: ['videos'],
     queryFn: fetchVideos,
-    staleTime: 1000 * 60, // 1 minute
-    gcTime: 1000 * 60 * 5, // 5 minutes
-    initialData: [],
+    staleTime: 0,
+    gcTime: 0,
+    // initialData: [],
   });
 
   if (isLoading) {
@@ -36,15 +44,16 @@ const VideoList: React.FC = () => {
   }
 
   if (isError) {
+    console.error('[VideoList] Query error:', error);
     return <div className="text-red-600 text-center">{error?.message || 'Could not load videos'}</div>;
   }
 
   return (
     <div className="space-y-4">
-      {videos.length === 0 ? (
+      {videos && videos.length === 0 ? (
         <div className="text-center text-gray-500">No videos found.</div>
       ) : (
-        videos.map((video) => (
+        videos && videos.map((video) => (
           <div key={video.videoId} className="p-4 rounded-lg shadow bg-white dark:bg-gray-800">
             <h3 className="text-lg font-bold text-blue-700 dark:text-blue-300">{video.title}</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-1">{video.description}</p>

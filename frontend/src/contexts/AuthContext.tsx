@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const session = await fetchAuthSession();
       // @ts-ignore
       const idTokenPayload = session.tokens?.idToken?.payload;
-      setUser({
+      const userObj = {
         ...currentUser,
         email: idTokenPayload?.email ?? '',
         name:
@@ -34,11 +34,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           (typeof idTokenPayload?.email === 'string'
             ? idTokenPayload.email.split('@')[0]
             : 'User')
-      });
+      };
+      setUser(userObj);
       setIsAuthenticated(true);
+      console.log('[Auth] Authenticated user:', userObj);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
+      console.error('[Auth] Authentication error:', error);
     } finally {
       setIsLoading(false);
     }
