@@ -47,7 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function getAuthToken() {
     try {
       const session = await fetchAuthSession();
-      return session.tokens?.idToken?.toString();
+      const token = session.tokens?.idToken?.toString();
+      return token !== undefined ? token : null;
     } catch (error) {
       return null;
     }
