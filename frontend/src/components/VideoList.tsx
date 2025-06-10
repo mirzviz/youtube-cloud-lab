@@ -24,7 +24,7 @@ async function fetchVideos(): Promise<Video[]> {
 }
 
 const VideoList: React.FC = () => {
-  const { data: videos, isLoading, isError, error, isFetching, status } = useQuery<Video[], Error>({
+  const { data: videos, isLoading, isError, error } = useQuery<Video[], Error>({
     queryKey: ['videos'],
     queryFn: fetchVideos,
     staleTime: 0,
