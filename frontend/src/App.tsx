@@ -11,7 +11,7 @@ function App() {
   const [filename, setFilename] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [videoId, setVideoId] = useState<string>('')
+  const [_, setVideoId] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
   const [error, setError] = useState('')
