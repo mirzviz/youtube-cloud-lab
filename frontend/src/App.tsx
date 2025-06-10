@@ -120,10 +120,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
+    <div className="min-h-screen bg-gray-100">
+      <div className="fixed top-4 right-4 z-50">
+        {isAuthenticated ? <LogoutButton /> : <LoginButton />}
+      </div>
+      <div className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Video Upload</h1>
             {isAuthenticated && user && (
               <p className="text-sm text-gray-500 mt-1">
@@ -131,105 +134,102 @@ function App() {
               </p>
             )}
           </div>
-          <div>
-            {isAuthenticated ? <LogoutButton /> : <LoginButton />}
-          </div>
+          
+          {!isAuthenticated ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">Please log in to upload videos</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+                  Select MP4 Video
+                </label>
+                <input
+                  type="file"
+                  id="file"
+                  accept="video/mp4"
+                  onChange={handleFileChange}
+                  className="mt-1 block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                    focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+                    p-2 border"
+                  placeholder="Enter video title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                    focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+                    p-2 border"
+                  placeholder="Enter video description"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="filename" className="block text-sm font-medium text-gray-700">
+                  Filename
+                </label>
+                <input
+                  type="text"
+                  id="filename"
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                    focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+                    p-2 border"
+                  placeholder="Enter filename"
+                />
+              </div>
+
+              {error && (
+                <div className="text-red-600 text-sm">{error}</div>
+              )}
+
+              {uploadComplete && (
+                <div className="text-green-600 text-sm">Upload complete!</div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isUploading || !file || !filename}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white
+                  ${isUploading || !file || !filename
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                  }`}
+              >
+                {isUploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </form>
+          )}
         </div>
-        
-        {!isAuthenticated ? (
-          <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">Please log in to upload videos</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-                Select MP4 Video
-              </label>
-              <input
-                type="file"
-                id="file"
-                accept="video/mp4"
-                onChange={handleFileChange}
-                className="mt-1 block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                  focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                  p-2 border"
-                placeholder="Enter video title"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                  focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                  p-2 border"
-                placeholder="Enter video description"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="filename" className="block text-sm font-medium text-gray-700">
-                Filename
-              </label>
-              <input
-                type="text"
-                id="filename"
-                value={filename}
-                onChange={(e) => setFilename(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                  focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                  p-2 border"
-                placeholder="Enter filename"
-              />
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm">{error}</div>
-            )}
-
-            {uploadComplete && (
-              <div className="text-green-600 text-sm">Upload complete!</div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isUploading || !file || !filename}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white
-                ${isUploading || !file || !filename
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                }`}
-            >
-              {isUploading ? 'Uploading...' : 'Upload'}
-            </button>
-          </form>
-        )}
       </div>
     </div>
   )
