@@ -1,13 +1,23 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 
-export function useAuth() {
+interface AuthContextType {
+  isAuthenticated: boolean;
+  user: any;
+  isLoading: boolean;
+  getAuthToken: () => Promise<string | null>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     checkAuth();
+    // Optionally, listen for auth events here for real-time updates
   }, []);
 
   async function checkAuth() {
@@ -16,7 +26,6 @@ export function useAuth() {
       const session = await fetchAuthSession();
       // @ts-ignore
       const idTokenPayload = session.tokens?.idToken?.payload;
-      console.log('ID token payload:', idTokenPayload);
       setUser({
         ...currentUser,
         email: idTokenPayload?.email ?? '',
@@ -27,11 +36,9 @@ export function useAuth() {
             : 'User')
       });
       setIsAuthenticated(true);
-      console.log('Authenticated user:', currentUser, idTokenPayload);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
-      console.log('Not authenticated:', error);
     } finally {
       setIsLoading(false);
     }
@@ -42,10 +49,21 @@ export function useAuth() {
       const session = await fetchAuthSession();
       return session.tokens?.idToken?.toString();
     } catch (error) {
-      console.error('Error getting auth token:', error);
       return null;
     }
   }
 
-  return { isAuthenticated, user, isLoading, getAuthToken };
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, user, isLoading, getAuthToken }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuthContext() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuthContext must be used within an AuthProvider');
+  }
+  return context;
 } 

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
-interface VideoUploadProps {
-  isDarkMode: boolean;
-}
-
-const VideoUpload: React.FC<VideoUploadProps> = ({ isDarkMode }) => {
+const VideoUpload: React.FC = () => {
   const navigate = useNavigate();
-  const { getAuthToken } = useAuth();
+  const { getAuthToken } = useAuthContext();
+  const { isDarkMode } = useDarkMode();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -123,17 +121,11 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ isDarkMode }) => {
   }
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen pt-16 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Upload Video</h1>
-            <button
-              onClick={() => navigate('/')}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-            >
-              Back to Home
-            </button>
           </div>
 
           <div className="space-y-6">

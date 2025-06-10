@@ -1,16 +1,11 @@
 import React from 'react';
-import Toolbar from './Toolbar';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
-interface LandingPageProps {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-}
+const LandingPage: React.FC = () => {
+  const { isDarkMode } = useDarkMode();
 
-const LandingPage: React.FC<LandingPageProps> = ({ isDarkMode, toggleDarkMode }) => {
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-      <Toolbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-      
       {/* Add padding-top to account for fixed toolbar */}
       <div className="pt-16">
         <div className="container mx-auto px-4 py-8">

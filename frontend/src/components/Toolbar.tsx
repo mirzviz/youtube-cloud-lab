@@ -2,16 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginButton } from './LoginButton';
 import { LogoutButton } from './LogoutButton';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
-interface ToolbarProps {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-}
-
-const Toolbar: React.FC<ToolbarProps> = ({ isDarkMode, toggleDarkMode }) => {
+const Toolbar: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthContext();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   return (
     <div className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b ${
@@ -26,6 +23,15 @@ const Toolbar: React.FC<ToolbarProps> = ({ isDarkMode, toggleDarkMode }) => {
           </h1>
           
           <div className="flex items-center space-x-3">
+            <button
+              onClick={() => navigate('/')}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 shadow-sm"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8v8m5 0h-2a2 2 0 01-2-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v8a2 2 0 01-2 2H3" />
+              </svg>
+              Home
+            </button>
             <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-lg transition-all duration-200 ${
