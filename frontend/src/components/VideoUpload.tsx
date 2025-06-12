@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { videoService } from '../api/videoService';
 
 const VideoUpload: React.FC = () => {
   const navigate = useNavigate();
-  const { getAuthToken } = useAuthContext();
   const { isDarkMode } = useDarkMode();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
@@ -36,65 +35,20 @@ const VideoUpload: React.FC = () => {
     setError('');
 
     try {
-      const idToken = await getAuthToken();
-      if (!idToken) {
-        throw new Error('Not authenticated');
-      }
-
       const newVideoId = crypto.randomUUID();
       const newFilename = `${newVideoId}.mp4`;
 
-      // Get presigned URL
-      const response = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/upload-url', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ filename: newFilename }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get upload URL');
-      }
-
-      const { uploadUrl } = await response.json();
-      console.log('[Upload] Uploading file:', { filename: newFilename, file: selectedFile });
-
-      // Upload file
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: selectedFile,
-        headers: {
-          'Content-Type': 'video/mp4',
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
-      }
+      // Get presigned URL and upload file
+      const uploadUrl = await videoService.getUploadUrl(newFilename);
+      await videoService.uploadVideo(uploadUrl, selectedFile);
 
       // Register video metadata
-      const metadata = {
+      await videoService.registerVideo({
         videoId: newVideoId,
         title,
         description: description || '',
-        createdAt: new Date().toISOString(),
         s3Key: newFilename
-      };
-      console.log('[Upload] Registering video metadata:', metadata);
-      const metadataResponse = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/register-video', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify(metadata),
       });
-
-      if (!metadataResponse.ok) {
-        throw new Error('Failed to register video metadata');
-      }
 
       setUploadComplete(true);
       // Wait for 2 seconds to show the success message before redirecting

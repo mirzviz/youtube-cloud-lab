@@ -1,35 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-
-interface Video {
-  videoId: string;
-  title: string;
-  description: string;
-  createdAt: string;
-}
-
-async function fetchVideos(): Promise<Video[]> {
-  console.log('[fetchVideos] called');
-  try {
-    const res = await fetch('https://7ehv3qnn63.execute-api.eu-north-1.amazonaws.com/dev/listVideos');
-    console.log('[fetchVideos] response status:', res.status);
-    if (!res.ok) throw new Error('Failed to fetch videos');
-    const data = await res.json();
-    console.log('[fetchVideos] API response:', data);
-    return data.videos || [];
-  } catch (err) {
-    console.error('[fetchVideos] Error fetching videos:', err);
-    throw err;
-  }
-}
+import { videoService } from '../api/videoService';
+import type { Video } from '../api/videoService';
 
 const VideoList: React.FC = () => {
   const { data: videos, isLoading, isError, error } = useQuery<Video[], Error>({
     queryKey: ['videos'],
-    queryFn: fetchVideos,
+    queryFn: () => videoService.listVideos(),
     staleTime: 0,
     gcTime: 0,
-    // initialData: [],
   });
 
   if (isLoading) {

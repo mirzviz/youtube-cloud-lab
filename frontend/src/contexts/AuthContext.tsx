@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 
-interface AuthContextType {
+export interface AuthContextType {
   isAuthenticated: boolean;
   user: any;
   isLoading: boolean;
