@@ -1,0 +1,9 @@
+{
+  "name": "get-playback-url",
+  "version": "1.0.0",
+  "description": "Lambda function to get signed S3 URLs for video playback",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1531.0"
+  }
+} 

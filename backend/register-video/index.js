@@ -7,9 +7,9 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
-    const { videoId, title, description } = body;
+    const { videoId, s3Key, title, description } = body;
 
-    if (!videoId || !title) {
+    if (!videoId || !title || !s3Key) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Missing required fields' }),
@@ -20,6 +20,7 @@ exports.handler = async (event) => {
       TableName: 'Videos',
       Item: {
         videoId: { S: videoId },
+        s3Key: { S: s3Key },
         title: { S: title },
         description: { S: description || '' },
         createdAt: { S: new Date().toISOString() },
