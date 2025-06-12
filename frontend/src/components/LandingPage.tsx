@@ -1,9 +1,11 @@
 import React from 'react';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { useAuthContext } from '../contexts/AuthContext';
 import VideoList from './VideoList';
 
 const LandingPage: React.FC = () => {
   const { isDarkMode } = useDarkMode();
+  const { isAuthenticated } = useAuthContext();
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
@@ -18,7 +20,13 @@ const LandingPage: React.FC = () => {
               Upload and share your videos with the world
             </p>
           </div>
-          <VideoList />
+          {isAuthenticated ? (
+            <VideoList />
+          ) : (
+            <div className="text-center text-gray-600 dark:text-gray-300">
+              Please log in to view videos
+            </div>
+          )}
         </div>
       </div>
     </div>
