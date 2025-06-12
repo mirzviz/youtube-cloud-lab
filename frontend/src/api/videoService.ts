@@ -12,6 +12,10 @@ export interface VideoUploadUrl {
   uploadUrl: string;
 }
 
+interface PlaybackUrlResponse {
+  playbackUrl: string;
+}
+
 export const videoService = {
   async listVideos(): Promise<Video[]> {
     const response = await ApiClient.get<{ videos: Video[] }>('/listVideos', { requiresAuth: true });
@@ -36,5 +40,11 @@ export const videoService = {
       createdAt: new Date().toISOString()
     };
     await ApiClient.post('/register-video', videoWithTimestamp, { requiresAuth: true });
-  }
+  },
+
+  async getPlaybackUrl(videoId: string): Promise<string> {
+    const data = await ApiClient.get<PlaybackUrlResponse>(`/get-playback-url?videoId=${videoId}`, { requiresAuth: true });
+    console.log(data.playbackUrl);
+    return data.playbackUrl;
+  },
 }; 

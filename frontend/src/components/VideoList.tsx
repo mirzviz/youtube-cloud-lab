@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { videoService } from '../api/videoService';
 import type { Video } from '../api/videoService';
 
@@ -33,11 +34,17 @@ const VideoList: React.FC = () => {
         <div className="text-center text-gray-500">No videos found.</div>
       ) : (
         videos && videos.map((video) => (
-          <div key={video.videoId} className="p-4 rounded-lg shadow bg-white dark:bg-gray-800">
-            <h3 className="text-lg font-bold text-blue-700 dark:text-blue-300">{video.title}</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-1">{video.description}</p>
-            <span className="text-xs text-gray-400">{new Date(video.createdAt).toLocaleString()}</span>
-          </div>
+          <Link 
+            key={video.videoId} 
+            to={`/video/${video.videoId}`}
+            className="block hover:opacity-90 transition-opacity"
+          >
+            <div className="p-4 rounded-lg shadow bg-white dark:bg-gray-800">
+              <h3 className="text-lg font-bold text-blue-700 dark:text-blue-300">{video.title}</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-1">{video.description}</p>
+              <span className="text-xs text-gray-400">{new Date(video.createdAt).toLocaleString()}</span>
+            </div>
+          </Link>
         ))
       )}
     </div>
