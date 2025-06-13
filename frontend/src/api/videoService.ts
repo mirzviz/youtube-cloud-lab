@@ -23,14 +23,17 @@ export const videoService = {
   },
 
   async getUploadUrl(filename: string): Promise<string> {
-    const response = await ApiClient.post<VideoUploadUrl>('/upload-url', { filename }, { requiresAuth: true });
+    const response = await ApiClient.post<VideoUploadUrl>('/upload-url', { filename }, { 
+      requiresAuth: true,
+      contentType: 'application/json'
+    });
     return response.uploadUrl;
   },
 
   async uploadVideo(uploadUrl: string, file: File): Promise<void> {
     await ApiClient.put(uploadUrl, file, { 
       requiresAuth: false, // Presigned URLs don't need auth
-      contentType: 'video/mp4'
+      contentType: undefined // Do not set Content-Type header for S3 uploads
     });
   },
 

@@ -15,9 +15,11 @@ class ApiClient {
   }
 
   private static async getHeaders(config: ApiClientConfig = {}): Promise<HeadersInit> {
-    const headers: HeadersInit = {
-      'Content-Type': config.contentType || 'application/json',
-    };
+    const headers: HeadersInit = {};
+
+    if (config.contentType !== undefined) {
+      headers['Content-Type'] = config.contentType;
+    }
 
     if (config.requiresAuth && ApiClient.authContext) {
       const token = await ApiClient.authContext.getAuthToken();
@@ -31,14 +33,24 @@ class ApiClient {
 
   private static async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
+      // Log error details to the console
+      const errorText = await response.text();
+      console.error(`API request failed: ${response.statusText}`, errorText);
       throw new Error(`API request failed: ${response.statusText}`);
     }
-    return response.json();
+    // Only try to parse JSON if there is content and content-type is JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return response.json();
+    }
+    // If no content or not JSON, return null
+    return null as unknown as T;
   }
 
   static async get<T>(endpoint: string, config: ApiClientConfig = {}): Promise<T> {
     const headers = await this.getHeaders(config);
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
       method: 'GET',
       headers,
     });
@@ -47,27 +59,30 @@ class ApiClient {
 
   static async post<T>(endpoint: string, data: any, config: ApiClientConfig = {}): Promise<T> {
     const headers = await this.getHeaders(config);
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: config.contentType === 'application/json' ? JSON.stringify(data) : data,
+      body: config.contentType && config.contentType !== 'application/json' ? data : JSON.stringify(data),
     });
     return this.handleResponse<T>(response);
   }
 
   static async put<T>(endpoint: string, data: any, config: ApiClientConfig = {}): Promise<T> {
     const headers = await this.getHeaders(config);
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
       method: 'PUT',
       headers,
-      body: config.contentType === 'application/json' ? JSON.stringify(data) : data,
+      body: config.contentType && config.contentType !== 'application/json' ? data : JSON.stringify(data),
     });
     return this.handleResponse<T>(response);
   }
 
   static async delete<T>(endpoint: string, config: ApiClientConfig = {}): Promise<T> {
     const headers = await this.getHeaders(config);
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
       method: 'DELETE',
       headers,
     });
