@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { videoService } from '../api/videoService';
+import { VideoFileSchema } from '../schemas/file';
+import { VideoRegistrationSchema } from '../schemas/video';
+import { getErrorMessage } from '../utils/errorHandling';
 
 const VideoUpload: React.FC = () => {
   const navigate = useNavigate();
@@ -16,12 +19,13 @@ const VideoUpload: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      if (file.type !== 'video/mp4') {
-        setError('Please select an MP4 file');
-        return;
+      try {
+        VideoFileSchema.parse(file);
+        setSelectedFile(file);
+        setError('');
+      } catch (error) {
+        setError(getErrorMessage(error));
       }
-      setSelectedFile(file);
-      setError('');
     }
   };
 
@@ -35,6 +39,14 @@ const VideoUpload: React.FC = () => {
     setError('');
 
     try {
+      // Validate the video data
+      VideoRegistrationSchema.parse({
+        videoId: crypto.randomUUID(),
+        title,
+        description: description || '',
+        s3Key: `${crypto.randomUUID()}.mp4`
+      });
+
       const newVideoId = crypto.randomUUID();
       const newFilename = `${newVideoId}.mp4`;
 
@@ -56,7 +68,7 @@ const VideoUpload: React.FC = () => {
         navigate('/');
       }, 2000);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(getErrorMessage(error));
     } finally {
       setUploading(false);
     }
@@ -126,6 +138,7 @@ const VideoUpload: React.FC = () => {
                   }`}
                   placeholder="Enter video title"
                   required
+                  disabled={uploading}
                 />
               </div>
 
@@ -144,6 +157,7 @@ const VideoUpload: React.FC = () => {
                   }`}
                   placeholder="Enter video description"
                   rows={4}
+                  disabled={uploading}
                 />
               </div>
             </div>
@@ -154,9 +168,9 @@ const VideoUpload: React.FC = () => {
 
             <button
               onClick={handleUpload}
-              disabled={!selectedFile || !title || uploading}
+              disabled={uploading || !selectedFile || !title}
               className={`w-full px-6 py-3 rounded-lg ${
-                !selectedFile || !title || uploading
+                uploading || !selectedFile || !title
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700'
               } text-white font-medium`}

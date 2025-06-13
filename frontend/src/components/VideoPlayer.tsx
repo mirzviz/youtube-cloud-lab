@@ -2,13 +2,19 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { videoService } from '../api/videoService';
+import { VideoSchema } from '../schemas/video';
 
 const VideoPlayer: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
 
   const { data: videoUrl, isLoading, isError, error } = useQuery<string, Error>({
     queryKey: ['videoUrl', videoId],
-    queryFn: () => videoService.getPlaybackUrl(videoId!),
+    queryFn: () => {
+      if (!videoId) throw new Error('Video ID is required');
+      // Validate videoId format
+      VideoSchema.shape.videoId.parse(videoId);
+      return videoService.getPlaybackUrl(videoId);
+    },
     enabled: !!videoId,
   });
 

@@ -1,36 +1,41 @@
 import ApiClient from './client';
-
-export interface Video {
-  videoId: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  s3Key?: string;
-}
-
-export interface VideoUploadUrl {
-  uploadUrl: string;
-}
-
-interface PlaybackUrlResponse {
-  playbackUrl: string;
-}
+import {
+  VideoSchema,
+  VideoListResponseSchema,
+  VideoUploadUrlSchema,
+  PlaybackUrlResponseSchema,
+  VideoUploadRequestSchema,
+  VideoRegistrationSchema,
+  type Video,
+  type VideoUploadUrl,
+  type PlaybackUrlResponse
+} from '../schemas/video';
+import { VideoFileSchema } from '../schemas/file';
 
 export const videoService = {
   async listVideos(): Promise<Video[]> {
     const response = await ApiClient.get<{ videos: Video[] }>('/listVideos', { requiresAuth: true });
-    return response.videos;
+    const validated = VideoListResponseSchema.parse(response);
+    return validated.videos;
   },
 
   async getUploadUrl(filename: string): Promise<string> {
+    // Validate the filename first
+    VideoUploadRequestSchema.parse({ filename });
+    
     const response = await ApiClient.post<VideoUploadUrl>('/upload-url', { filename }, { 
       requiresAuth: true,
       contentType: 'application/json'
     });
-    return response.uploadUrl;
+    
+    const validated = VideoUploadUrlSchema.parse(response);
+    return validated.uploadUrl;
   },
 
   async uploadVideo(uploadUrl: string, file: File): Promise<void> {
+    // Validate the file
+    VideoFileSchema.parse(file);
+    
     console.log('Uploading file:', file, 'size:', file?.size);
     await ApiClient.put(uploadUrl, file, { 
       requiresAuth: false, // Presigned URLs don't need auth
@@ -43,6 +48,10 @@ export const videoService = {
       ...video,
       createdAt: new Date().toISOString()
     };
+    
+    // Validate the video data
+    VideoRegistrationSchema.parse(video);
+    
     await ApiClient.post('/register-video', videoWithTimestamp, { 
       requiresAuth: true,
       contentType: 'application/json'
@@ -50,8 +59,11 @@ export const videoService = {
   },
 
   async getPlaybackUrl(videoId: string): Promise<string> {
+    // Validate the videoId
+    VideoSchema.shape.videoId.parse(videoId);
+    
     const data = await ApiClient.get<PlaybackUrlResponse>(`/get-playback-url?videoId=${videoId}`, { requiresAuth: true });
-    console.log(data.playbackUrl);
-    return data.playbackUrl;
+    const validated = PlaybackUrlResponseSchema.parse(data);
+    return validated.playbackUrl;
   },
 }; 

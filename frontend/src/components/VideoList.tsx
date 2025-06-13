@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { videoService } from '../api/videoService';
-import type { Video } from '../api/videoService';
+import type { Video } from '../schemas/video';
 
 const VideoList: React.FC = () => {
   const { data: videos, isLoading, isError, error } = useQuery<Video[], Error>({
