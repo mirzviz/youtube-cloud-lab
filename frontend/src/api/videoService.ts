@@ -31,6 +31,7 @@ export const videoService = {
   },
 
   async uploadVideo(uploadUrl: string, file: File): Promise<void> {
+    console.log('Uploading file:', file, 'size:', file?.size);
     await ApiClient.put(uploadUrl, file, { 
       requiresAuth: false, // Presigned URLs don't need auth
       contentType: undefined // Do not set Content-Type header for S3 uploads
@@ -42,7 +43,10 @@ export const videoService = {
       ...video,
       createdAt: new Date().toISOString()
     };
-    await ApiClient.post('/register-video', videoWithTimestamp, { requiresAuth: true });
+    await ApiClient.post('/register-video', videoWithTimestamp, { 
+      requiresAuth: true,
+      contentType: 'application/json'
+    });
   },
 
   async getPlaybackUrl(videoId: string): Promise<string> {

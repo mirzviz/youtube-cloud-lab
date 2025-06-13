@@ -63,7 +63,7 @@ class ApiClient {
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: config.contentType && config.contentType !== 'application/json' ? data : JSON.stringify(data),
+      body: config.contentType === 'application/json' ? JSON.stringify(data) : data,
     });
     return this.handleResponse<T>(response);
   }
@@ -71,10 +71,20 @@ class ApiClient {
   static async put<T>(endpoint: string, data: any, config: ApiClientConfig = {}): Promise<T> {
     const headers = await this.getHeaders(config);
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    console.log('PUT request to:', url);
+    console.log('PUT request body:', data);
+    console.log('typeof body:', typeof data);
+    console.log('body instanceof File:', data instanceof File);
+    console.log('body instanceof Blob:', data instanceof Blob);
+    if (data instanceof Blob) {
+      data.slice(0, 16).arrayBuffer().then(buf => {
+        console.log('First 16 bytes of body:', new Uint8Array(buf));
+      });
+    }
     const response = await fetch(url, {
       method: 'PUT',
       headers,
-      body: config.contentType && config.contentType !== 'application/json' ? data : JSON.stringify(data),
+      body: config.contentType === 'application/json' ? JSON.stringify(data) : data,
     });
     return this.handleResponse<T>(response);
   }
