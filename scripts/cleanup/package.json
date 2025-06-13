@@ -1,0 +1,15 @@
+{
+  "name": "cleanup",
+  "version": "1.0.0",
+  "description": "Cleanup script for DynamoDB and S3 corrupted files",
+  "main": "dynamodb-corruption-cleanup.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dynamodb-corruption-cleanup.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.828.0"
+  }
+}
