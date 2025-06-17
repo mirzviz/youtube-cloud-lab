@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import VideoUpload from './components/VideoUpload';
 import VideoPlayer from './components/VideoPlayer';
 import Toolbar from './components/Toolbar';
+import Layout from './components/Layout';
 import { AuthProvider, useAuthContext } from './contexts/AuthContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import ApiClient from './api/client';
@@ -28,8 +29,10 @@ function AppContent() {
     <Router>
       <Toolbar />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/video/:videoId" element={<VideoPlayer />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<LandingPage />} />
+          <Route path="video/:videoId" element={<VideoPlayer />} />
+        </Route>
         <Route
           path="/upload"
           element={
