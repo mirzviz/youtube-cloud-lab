@@ -34,17 +34,38 @@
 
 set -e
 
-rm -rf dist
-mkdir dist
-
-for dir in backend/*; do
-  if [ -d "$dir" ]; then
-    echo "Packaging $dir..."
-    cd "$dir"
-    npm ci
-    zip -r "../../dist/$(basename $dir).zip" index.js node_modules
-    cd - > /dev/null
+if [ -z "$1" ]; then
+  # No argument provided — package all
+  rm -rf dist
+  mkdir dist
+  
+  for dir in backend/*; do
+    if [ -d "$dir" ]; then
+      FUNCTION_NAME=$(basename $dir)
+      echo "Packaging $FUNCTION_NAME..."
+      cd "$dir"
+      npm ci
+      zip -r "../../dist/${FUNCTION_NAME}.zip" index.js node_modules
+      cd - > /dev/null
+    fi
+  done
+else
+  # Argument provided — package only one
+  FUNCTION_NAME="$1"
+  DIR="backend/${FUNCTION_NAME}"
+  if [ ! -d "$DIR" ]; then
+    echo "Error: function $FUNCTION_NAME does not exist."
+    exit 1
   fi
-done
 
-echo "✅ All backend functions packaged successfully." 
+  # Ensure dist directory exists
+  mkdir -p dist
+
+  echo "Packaging $FUNCTION_NAME..."
+  cd "$DIR"
+  npm ci
+  zip -r "../../dist/${FUNCTION_NAME}.zip" index.js node_modules
+  cd - > /dev/null
+fi
+
+echo "✅ Packaging completed." 
