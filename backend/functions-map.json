@@ -1,0 +1,6 @@
+{
+  "upload-presigned-url": "upload-presigned-url",
+  "register-video": "register-video",
+  "get-playback-url": "get-playback-url",
+  "list-videos": "listVideos"
+} 

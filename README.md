@@ -4,18 +4,36 @@ This project is a modern YouTube clone built with a cloud-first architecture. It
 
 ## Backend Deployment
 
-The backend Lambda functions can be packaged for deployment using the provided script:
+The backend Lambda functions can be packaged and deployed using the provided scripts:
 
+### Packaging Functions
 ```bash
+# Package all functions
 ./scripts/package-backend.sh
+
+# Package a specific function
+./scripts/package-backend.sh list-videos
 ```
 
-This script will:
-- Install dependencies for each backend function
-- Create deployment-ready zip files
-- Place the zip files in a `dist/` directory
+### Deploying Functions
+```bash
+# Deploy all functions
+./scripts/deploy-backend.sh
 
-See the script's header comments for detailed usage instructions and requirements.
+# Deploy a specific function
+./scripts/deploy-backend.sh list-videos
+```
+
+The scripts handle:
+- Installing dependencies
+- Creating deployment-ready zip files
+- Deploying to AWS Lambda
+- Mapping folder names to Lambda function names
+
+Requirements:
+- Node.js
+- AWS CLI configured
+- jq for JSON processing
 
 ## Data Cleanup Utilities
 
